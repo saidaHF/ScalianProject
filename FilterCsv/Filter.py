@@ -15,14 +15,35 @@ class Filter:
         self.CSVDataMvt = self.readFileCsv(mvtCSV)
 
     def loadProgram(self):
+        self.configureLogs()
+        self.checkParameters()
         self.filterByEntityAndCurrency(self.CSVDataAgg)
         self.filterByEntityAndCurrency(self.CSVDataMvt)
 
+    def configureLogs(self):
+        try:
+            mkdir('logs')
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise Exception(e)
+        pathLogFile = "./logs/" + datetime.today().strftime('%Y-%m-%d_%H_%M_%S') + ".log"
+        logging.basicConfig(filename=pathLogFile, encoding='utf-8', level=logging.DEBUG)
+    def checkParameters(self):
+        logging.info("Checking if all parameters are correct")
+        if len(sys.argv) < 2:
+            logging.error("Parameters not found")
+            raise Exception("You need 'entity' parameter")
+        if len(sys.argv) > 3:
+            logging.error("Found too many parameters")
+            raise Exception("Too many parameters. Check out!")
+        logging.info("Loading parameters correct")
+
     def filterByEntityAndCurrency(self, CSVData):
+
         s1, s2 = sys.argv[1], sys.argv[2]
         if s1 is None:
             print("Please, add the first parameter 'entity': ")
-            logging.error("ERROR: Parameter 'entity' not detected. The aplication need this parameter.")
+            logging.error("Parameter 'entity' not detected. The aplication need this parameter.")
         self.filterByValue(CSVData, s1, "entity")
         if s2 is not None:
             self.filterByValue(CSVData, s2, "currency")
@@ -32,7 +53,7 @@ class Filter:
         count = 0
         nameColumn = nameColumn.lower()
         if nameColumn not in CSVData[0]:
-            logging.error("ERROR: Not found value in CSV file")
+            logging.error("Not found value in CSV file")
             raise Exception(f"{nameColumn} not found in csv file")
         positionColumn = CSVData[0].index(nameColumn)
         for i in range(len(CSVData)):
@@ -66,22 +87,9 @@ class Filter:
             return CSVData
 
         except IOError as e:
-            print(f"I/O error({0}): {1}".format(e.errno, e.strerror))
+            logging.error(f"I/O error({0}): {1}".format(e.errno, e.strerror))
 
 
 if __name__ == "__main__":
-    try:
-        mkdir('logs')
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
-    pathLogFile = "./logs/" + datetime.today().strftime('%Y-%m-%d_%H_%M_%S') + ".log"
-    logging.basicConfig(filename=pathLogFile, encoding='utf-8', level=logging.DEBUG)
-    # logging.debug('This message should go to the log file')
-    # logging.info('So should this')
-    # logging.warning('And this, too')
-    # logging.error('And non-ASCII stuff, too, like Øresund and Malmö')
     filter = Filter()
     filter.loadProgram()
-    # test.readFileCsv(aggCSV)
-    # test.askParametter()

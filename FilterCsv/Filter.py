@@ -22,19 +22,26 @@ class Filter:
         if s2 is not None:
             self.filterByValue(CSVData, s2, "currency")
 
-    def filterByValue(self, CSVData, s1, value):
+    def filterByValue(self, CSVData, value, nameColumn):
+        isEquals = True
         count = 0
-        value = value.lower()
-        if value not in CSVData[0]:
-            raise Exception(f"{value} not found in csv file")
-        positionValue = CSVData[0].index(value)
+        nameColumn = nameColumn.lower()
+        if nameColumn not in CSVData[0]:
+            raise Exception(f"{nameColumn} not found in csv file")
+        positionColumn = CSVData[0].index(nameColumn)
         for i in range(len(CSVData)):
-            # CSVData[0] -> la fila entera
-            # entity obligatorio:
-            if s1 in CSVData[i][positionValue]:
-                # print(CSVData[i])  # -> resultado del filtro de entity/currency
-                count += 1
-        print(f"{s1} is {count} times")
+            # CSVData[0] -> all row
+            # entity is obligatory:
+            if isEquals:
+                if value in CSVData[i][positionColumn]:
+                    # print(CSVData[i])  # -> resultado del filtro
+                    count += 1
+            else:
+                if value not in CSVData[i][positionColumn]:
+                    # print(CSVData[i])  # -> resultado del filtro
+                    count += 1
+
+        print(f"{value} is {count} times")
         return CSVData[i]
 
     def readFileCsv(self, path):
@@ -42,16 +49,13 @@ class Filter:
             with open(path) as file:
                 reader = csv.reader(file)
                 if not reader:
-                    print("There are NOT data in file: " + path)
-
+                    print(f"There are NOT data in file: {path}")
                 CSVData = []
                 for row in reader:
-                    # CSVData.append([])
                     totalRow = ""
                     for column in row:
                         totalRow += column
                     CSVData.append(totalRow.split(";"))
-
             return CSVData
 
         except IOError as e:

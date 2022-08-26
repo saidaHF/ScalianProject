@@ -7,24 +7,22 @@ mvtCSV = "./resources/mvt.csv"
 
 class Filter:
     def __init__(self):
-
         self.CSVDataAgg = self.readFileCsv(aggCSV)
         self.CSVDataMvt = self.readFileCsv(mvtCSV)
 
     def loadProgram(self):
-        s1, s2 = sys.argv[1], sys.argv[2]
+        self.filterByEntityAndCurrency(self.CSVDataAgg)
+        self.filterByEntityAndCurrency(self.CSVDataMvt)
 
+    def filterByEntityAndCurrency(self, CSVData):
+        s1, s2 = sys.argv[1], sys.argv[2]
         if s1 is None:
             print("Please, add the first parameter 'entity': ")
-        self.filterChoice(self.CSVDataAgg, s1, "entity")
-
+        self.filterByValue(CSVData, s1, "entity")
         if s2 is not None:
-            self.filterChoice(self.CSVDataAgg, s2, "currency")
+            self.filterByValue(CSVData, s2, "currency")
 
-        # self.filterChoice(self.CSVDataMvt, s1, s2)
-
-    # value is entity or currency, s1 = PARIS
-    def filterChoice(self, CSVData, s1, value):
+    def filterByValue(self, CSVData, s1, value):
         count = 0
         value = value.lower()
         if value not in CSVData[0]:

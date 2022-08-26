@@ -13,25 +13,31 @@ class Filter:
 
     def loadProgram(self):
         s1, s2 = sys.argv[1], sys.argv[2]
+
         if s1 is None:
             print("Please, add the first parameter 'entity': ")
-        self.filterChoice(self.CSVDataAgg, s1, s2)
-        # self.filterChoice(CSVDataMvt, s1, s2)
+        self.filterChoice(self.CSVDataAgg, s1, "entity")
 
-    def filterChoice(self, CSVData, s1, s2):
-        if "entity" not in CSVData[0]:
-            raise Exception("Entity not gofun in blsalbal")
-        positionEntity = CSVData[0].index("entity")
+        if s2 is not None:
+            self.filterChoice(self.CSVDataAgg, s2, "currency")
+
+        # self.filterChoice(self.CSVDataMvt, s1, s2)
+
+    # value is entity or currency, s1 = PARIS
+    def filterChoice(self, CSVData, s1, value):
+        count = 0
+        value = value.lower()
+        if value not in CSVData[0]:
+            raise Exception(f"{value} not found in csv file")
+        positionValue = CSVData[0].index(value)
         for i in range(len(CSVData)):
-            # print(CSVData[0]) -> la fila entera
+            # CSVData[0] -> la fila entera
             # entity obligatorio:
-            print(i)
-            if s1 in CSVData[i][positionEntity]:  # Fila entity
-                print(CSVData[i])
-
-                #and posicion de esa columna == s1:
-                # si estoy en la columna entity y hay un valor == al pasado s1 (p.e. PARIS) imprimir línea
-                # print(CSVData[i])
+            if s1 in CSVData[i][positionValue]:
+                # print(CSVData[i])  # -> resultado del filtro de entity/currency
+                count += 1
+        print(f"{s1} is {count} times")
+        return CSVData[i]
 
     def readFileCsv(self, path):
         try:

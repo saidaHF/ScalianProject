@@ -26,12 +26,27 @@ class Filter:
         CSVDataMvt = self.filterByEntityAndCurrency(self.CSVDataMvt)
         print("Filter -> in mvt status != expected:")
         self.filterByValue(CSVDataMvt, "expected", "status", False)
-        print("Filter -> in agg value true in isTotalCash and statusLiq != expected:")
-        self.filterByValue(CSVDataAgg, "true", "isTotalCash", True)
+        # Writer file
+        CSVDataMvtFilters = self.filterByValue(CSVDataMvt, "expected", "status", False)
+        self.writeFile(CSVDataMvtFilters, "Movement")
 
+        # print("Filter -> in agg value true in isTotalCash and statusLiq != expected:")
+        # self.filterByValue(CSVDataAgg, "true", "isTotalCash", True)
+
+    def writeFile(self, dataToWrite, nameDirectory):
+        try:
+            mkdir("results")
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise Exception(e)
+
+        path = "results" + '/' + nameDirectory + '_' + datetime.today().strftime('%Y-%m-%d_%H_%M_%S')
+        with open(path, 'w') as f:
+            for i in dataToWrite:
+                f.write(str(i) + "\n")
     def configureLogs(self):
         try:
-            mkdir('logs')
+            mkdir("logs")
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise Exception(e)
@@ -79,7 +94,6 @@ class Filter:
                     CSVDataNew.append(CSVData[i])
             else:
                 if value != CSVData[i][positionColumn]:
-                    print(CSVData[i])
                     count += 1
                     CSVDataNew.append(CSVData[i])
         print(f"{value} is {count} times")

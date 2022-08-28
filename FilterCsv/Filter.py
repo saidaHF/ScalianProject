@@ -58,7 +58,6 @@ class Filter:
         return CSVData
 
     def filterByValue(self, CSVData, value, nameColumn, isContainValue):
-        # isContainValue = False
         count = 0  # for test
         nameColumn = nameColumn.lower()
 
@@ -78,13 +77,11 @@ class Filter:
                 if value in CSVData[i][positionColumn]:
                     count += 1
                     CSVDataNew.append(CSVData[i])
-                    # return CSVData[i]
             else:
                 if value != CSVData[i][positionColumn]:
                     print(CSVData[i])
                     count += 1
                     CSVDataNew.append(CSVData[i])
-                    # return CSVData[i]
         print(f"{value} is {count} times")
         return CSVDataNew
 

@@ -98,7 +98,7 @@ class Filter:
                         totalRow += column
                     CSVData.append(totalRow.split(";"))
             return CSVData
-
+#
         except IOError as e:
             logging.error(f"I/O error({0}): {1}".format(e.errno, e.strerror))
 

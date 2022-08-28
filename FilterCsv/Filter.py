@@ -1,8 +1,9 @@
 import csv
 import sys
 import logging
-from os import mkdir
+import MySQLdb
 import errno
+from os import mkdir
 from datetime import datetime
 
 aggCSV = "./resources/agg.csv"

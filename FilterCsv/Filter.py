@@ -18,8 +18,16 @@ class Filter:
     def loadProgram(self):
         self.configureLogs()
         self.checkParameters()
-        self.filterByEntityAndCurrency(self.CSVDataAgg)
-        self.filterByEntityAndCurrency(self.CSVDataMvt)
+        # self.resultFilterAgg = \
+        print("Filter AGG:")
+        CSVDataAgg = self.filterByEntityAndCurrency(self.CSVDataAgg)
+        # self.resultFilterMvt = \
+        print("Filter MVT:")
+        CSVDataMvt = self.filterByEntityAndCurrency(self.CSVDataMvt)
+        print("Filter -> in mvt status != expected:")
+        self.filterByValue(CSVDataMvt, "expected", "status", False)
+        print("Filter -> in agg value true in isTotalCash and statusLiq != expected:")
+        self.filterByValue(CSVDataAgg, "true", "isTotalCash", True)
 
     def configureLogs(self):
         try:
@@ -40,45 +48,52 @@ class Filter:
         logging.info("Loading parameters correct")
 
     def filterByEntityAndCurrency(self, CSVData):
-
-        s1, s2 = sys.argv[1], sys.argv[2]
-        if s1 is None:
+        parameterEntity, parameterCurrency = sys.argv[1], sys.argv[2]
+        if parameterEntity is None:
             print("Please, add the first parameter 'entity': ")
             logging.error("Parameter 'entity' not detected. The aplication need this parameter.")
-        self.filterByValue(CSVData, s1, "entity")
-        if s2 is not None:
-            self.filterByValue(CSVData, s2, "currency")
+        CSVData = self.filterByValue(CSVData, parameterEntity, "entity", True)
+        if parameterCurrency is not None:
+            CSVData = self.filterByValue(CSVData, parameterCurrency, "currency", True)
+        return CSVData
 
-    def filterByValue(self, CSVData, value, nameColumn):
-        isEquals = False
-        count = 0
+    def filterByValue(self, CSVData, value, nameColumn, isContainValue):
+        # isContainValue = False
+        count = 0  # for test
         nameColumn = nameColumn.lower()
+
+        CSVDataNew = []
+        # CSVData[0] is always the header
+        CSVDataNew.append(CSVData[0])
+
         if nameColumn not in CSVData[0]:
             logging.error("Not found value in CSV file")
             raise Exception(f"{nameColumn} not found in csv file")
-        positionColumn = CSVData[0].index(nameColumn)
-        for i in range(len(CSVData)):
-            # CSVData[0] -> all row
-            # entity is obligatory:
-            if isEquals:
-                if value in CSVData[i][positionColumn]:
-                    # print(CSVData[i])  # -> resultado del filtro
-                    count += 1
-            else:
-                if value not in CSVData[i][positionColumn]:
-                    # print(CSVData[i])  # -> resultado del filtro
-                    # status not expected
-                    count += 1
 
+        positionColumn = CSVData[0].index(nameColumn)
+
+        for i in range(1, len(CSVData)):
+            # CSVData[0] -> all row
+            if isContainValue:
+                if value in CSVData[i][positionColumn]:
+                    count += 1
+                    CSVDataNew.append(CSVData[i])
+                    # return CSVData[i]
+            else:
+                if value != CSVData[i][positionColumn]:
+                    print(CSVData[i])
+                    count += 1
+                    CSVDataNew.append(CSVData[i])
+                    # return CSVData[i]
         print(f"{value} is {count} times")
-        return CSVData[i]
+        return CSVDataNew
 
     def readFileCsv(self, path):
         try:
             with open(path) as file:
                 reader = csv.reader(file)
                 if not reader:
-                    print(f"There are NOT data in file: {path}")
+                    logging.error(f"There are NOT data in file: {path}")
                 CSVData = []
                 for row in reader:
                     totalRow = ""
